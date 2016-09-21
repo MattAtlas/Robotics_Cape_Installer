@@ -1010,7 +1010,7 @@ void print_vector(vector_t v);
 void print_vector_sci_notation(vector_t v);
 
 // Multiplication, Addition, and other transforms
-matrix_t multiply_matrices(matrix_t A, matrix_t Bm);
+matrix_t multiply_matrices(matrix_t A, matrix_t B);
 int matrix_times_scalar(matrix_t* A, float s);
 int vector_times_scalar(vector_t* v, float s);
 vector_t matrix_times_col_vec(matrix_t A, vector_t v);
@@ -1041,6 +1041,61 @@ matrix_t householder_matrix(vector_t v);
 vector_t lin_system_solve(matrix_t A, vector_t b);
 vector_t lin_system_solve_qr(matrix_t A, vector_t b);
 int fit_ellipsoid(matrix_t points, vector_t* center, vector_t* lengths);
+
+
+
+/*******************************************************************************
+* State space filter math
+*
+*
+*******************************************************************************/
+typedef struct CT_SS_filter_t{
+	int states;
+	int inputs;
+	int outputs;
+	int saturation_en;
+	int saturation_flag;
+	vector_t saturation_high;
+	vector_t saturation_low;
+	matrix_t A;
+	matrix_t B;
+	matrix_t C; 
+	matrix_t D;
+	vector_t Xnew;
+	vector_t Xold;
+	vector_t Y;
+	matrix_t K;
+	matrix_t L;
+} CT_SS_filter_t;
+
+typedef struct DT_SS_filter_t{
+	float dt;
+	int states;
+	int inputs;
+	int outputs;
+	int saturation_en;
+	int saturation_flag;
+	vector_t saturation_high;
+	vector_t saturation_low;
+	matrix_t F;
+	matrix_t G;
+	matrix_t H;
+	matrix_t D; 
+	vector_t Xnew;
+	vector_t Xold;
+	vector_t Y;
+	matrix_t K;
+	matrix_t L;
+} DT_SS_filter_t;
+
+CT_SS_filter_t create_CT_SS_filter(int states, int inputs, int outputs);
+DT_SS_filter_t create_DT_SS_filter(CT_SS_filter_t* CT_sys, float dt);
+CT_SS_filter_t tf2ss(vector_t b, vector_t a);
+int march_SS_filter(DT_SS_filter_t* DT_sys, vector_t input);
+matrix_t C2D_A2F(matrix_t A, float h);
+matrix_t C2D_B2G(matrix_t A, matrix_t B, float h);
+
+
 
 
 /*******************************************************************************
